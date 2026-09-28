@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  patient
+  staff
+}
+
+enum RefillStatus {
+  requested
+  approved
+  packed
+  shipped
+  delivered
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String          @unique
+  role          Role            @default(patient)
+  createdAt     DateTime        @default(now())
+  prescriptions Prescription[]
+  statusChanges StatusHistory[]
+
+  @@map("users")
+}
+
+model Prescription {
+  id               Int             @id @default(autoincrement())
+  userId           Int
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicationName   String
+  dosage           String
+  timesPerDay      Int
+  quantity         Int
+  refillsRemaining Int             @default(0)
+  pharmacyName     String
+  lastFilledDate   DateTime
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  refillRequests   RefillRequest[]
+
+  @@index([userId])
+  @@map("prescriptions")
+}
+
+model RefillRequest {
+  id             Int             @id @default(autoincrement())
+  prescriptionId Int
+  prescription   Prescription    @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  status         RefillStatus    @default(requested)
+  requestedAt    DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  history        StatusHistory[]
+
+  @@index([status])
+  @@map("refill_requests")
+}
+
+model StatusHistory {
+  id              Int           @id @default(autoincrement())
+  refillRequestId Int
+  refillRequest   RefillRequest @relation(fields: [refillRequestId], references: [id], onDelete: Cascade)
+  fromStatus      RefillStatus?
+  toStatus        RefillStatus
+  changedByUserId Int
+  changedBy       User          @relation(fields: [changedByUserId], references: [id])
+  changedAt       DateTime      @default(now())
+
+  @@map("status_history")
+}
