@@ -72,4 +72,5 @@ npm run dev
 
 # Author
 
-Neha Prajapati, Full Stack Developer, Winnipeg, Canada 
+Neha Prajapati, Full Stack Developer, Winnipeg, Canada [Linkedin]:https://www.linkedin.com/in/neha-p-439a47213
+
