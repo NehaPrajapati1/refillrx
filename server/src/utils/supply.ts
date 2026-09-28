@@ -13,3 +13,10 @@ export function getDaysRemaining(prescription: Prescription, today: Date = new D
 export function isRunningLow(prescription: Prescription, thresholdDays = 7): boolean {
   return getDaysRemaining(prescription) <= thresholdDays;
 }
+export function withSupplyInfo<T extends Prescription>(prescription: T) {
+  return {
+    ...prescription,
+    daysRemaining: getDaysRemaining(prescription),
+    runningLow: isRunningLow(prescription),
+  };
+}
